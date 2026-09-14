@@ -16,7 +16,12 @@ class RAGService:
         self.live = bool(os.getenv("PINECONE_API_KEY") and (os.getenv("PINECONE_INDEX") or os.getenv("PINECONE_HOST")))
         self.chunks = chunks
         if self.live:
-            self.index = PineconeVectorIndex(self.embedder, namespace=os.getenv("PINECONE_NAMESPACE", "demo"))
+            self.index = PineconeVectorIndex(
+                self.embedder,
+                index_name=os.getenv("PINECONE_INDEX"),
+                host=os.getenv("PINECONE_HOST"),
+                namespace=os.getenv("PINECONE_NAMESPACE", "demo"),
+            )
             self.upserted_chunks = self.index.upsert(chunks)
         else:
             self.index = LocalVectorIndex(chunks, self.embedder)
