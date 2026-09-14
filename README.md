@@ -1,34 +1,44 @@
-# Business Due Diligence & Acquisition Intelligence — Rebased Final
+# Due Diligence Intelligence
 
-V2.1 is the authoritative analytical foundation. This Skill turns imperfect company evidence into reproducible decision intelligence: claim verification, source independence, reconciliation-aware discrepancies, calibrated confidence, risk and opportunity registers, evidence requests, management questions, Diligence Decision Maps, scenarios, transaction impacts, qualitative assessments, and deterministic quality gates.
+**Evidence-grounded Python due diligence analysis using retrieval-augmented generation.** This repository preserves the original standard-library due-diligence skill—claim verification, source independence, contradiction handling, evidence gaps, risk registers, and decision maps—and adds a transparent RAG engineering showcase around that logic.
 
-The host environment may supply an LLM for contextual interpretation and synthesis. This package is **LLM-agnostic** and does not implement provider selection, API authentication, credential storage, endpoints, model routing, billing, subscription management, entitlement counting, background execution, polling, scheduling, or a persistent backend.
+## What this demonstrates
 
-## Components
+- **Document ingestion:** existing case JSON sources are parsed into traceable evidence chunks.
+- **Chunking and metadata:** 900-character chunks with 120-character overlap retain document, source type, page, section, date, evidence tier, and topic metadata.
+- **Embeddings:** live mode uses the configured OpenAI embedding model; offline mode uses a deterministic hash vector only as a clearly labeled test/demo fallback.
+- **Vector retrieval:** live mode queries a real Pinecone index; offline mode performs deterministic cosine retrieval over the synthetic corpus.
+- **Grounded reasoning:** retrieved chunks are assembled into a labeled context before optional LLM analysis. Findings expose evidence, inference, uncertainty, and missing evidence.
+- **Existing domain analysis:** `scripts/evidence_tracker.py` remains the source of truth for evidence-calibrated due-diligence records and does not invent scores or conclusions.
 
-| Component | Purpose |
-| --- | --- |
-| `SKILL.md` | Evidence methodology, untrusted-content controls, host-LLM boundary, and Run-on-Demand rules. |
-| `scripts/validate_input.py` | Offline input and untrusted-content validation. |
-| `scripts/evidence_tracker.py` | Claims, evidence, reconciliation, decision outputs, and qualitative assessments. |
-| `scripts/build_report.py` | Markdown and standalone HTML report assembly. |
-| `scripts/quality_check.py` | Evidence, disclosure, status-consistency, and report-quality checks. |
-| `scripts/security_scan.py` | Static credential and deterministic-helper network-boundary scan. |
-| `config/config.json` | Non-secret package metadata and host-native runtime boundary. |
-| `V2.1_V2.2_FINAL_CHANGE_AUDIT.md` | Disposition of every significant V2.2 change. |
+## Demo
 
-## Local validation
+Run `python3 -m app.api.server` and open `http://localhost:8000/demo`. The UI is explicitly labeled offline when credentials are absent. Configure the variables in `.env.example` to enable live Pinecone retrieval and LLM reasoning; credentials remain server-side.
+
+## Architecture
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) and [RAG.md](RAG.md). The core path is **documents → ingestion → chunking → embeddings → Pinecone/local index → semantic retrieval → evidence context → reasoning → grounded finding**.
+
+## Existing analysis workflow
+
+The original implementation accepts structured JSON with a company, objective, source register, assertions, risks, opportunities, and evidence gaps. It produces Markdown/HTML due-diligence reports and deterministic validation. See [SKILL.md](SKILL.md), `scripts/`, and `sample/input/northstar_acquisition.json` (fictional).
+
+## Local setup and tests
 
 ```bash
-python3 -m compileall -q scripts tests
+python3 -m venv .venv && . .venv/bin/activate
 python3 -m unittest discover -s tests -v
 python3 scripts/validate_input.py sample/input/northstar_acquisition.json
-python3 scripts/evidence_tracker.py sample/input/northstar_acquisition.json --output sample/output/evidence_analysis.json
-python3 scripts/build_report.py sample/input/northstar_acquisition.json --output-dir sample/output --format all
-python3 scripts/quality_check.py sample/output/business_due_diligence_report.md --output sample/output/quality_check.json
-python3 scripts/security_scan.py --output sample/output/security_scan.json
+python3 scripts/evidence_tracker.py sample/input/northstar_acquisition.json --output /tmp/evidence.json
+python3 -m app.api.server
 ```
 
-The sample is fictional. The Skill is an AI-generated analytical aid, not legal, financial, investment, tax, accounting, or regulatory advice. It is designed for Run on Demand; one substantive investigation is one user request, and internal reasoning and deterministic processing are not separately counted by the Skill.
+Optional live providers are listed in `requirements-rag.txt`. Copy `.env.example` to `.env` and provide only your own server-side credentials. No credentials or proprietary customer data belong in this repository.
 
-Live model, provider, credential, data-processing, pricing, and platform request-limit settings are host-managed. Complete the platform’s live support, category, delivery, commercial, disclosure, test-case, and review fields before publication. No platform approval is claimed.
+## Limitations and honesty boundary
+
+The checked-in demo dataset is synthetic. Offline mode is not semantic model inference and is not presented as Pinecone. Live Pinecone/LLM execution requires credentials and an index configured by the operator. Retrieval quality is not benchmarked here; reranking, hybrid search, and a larger labeled evaluation set remain future improvements. This is an analytical aid, not legal, financial, investment, tax, accounting, or regulatory advice.
+
+## Origin
+
+The repository originated as a Capafy-native due-diligence skill. The showcase preserves that provenance and makes the engineering boundary independently understandable; it does not claim that the original implementation contained the added RAG adapters.

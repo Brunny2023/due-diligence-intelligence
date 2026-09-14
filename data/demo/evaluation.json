@@ -1,0 +1,4 @@
+[
+  {"question": "Does the target have customer concentration risk?", "expected_document_id": "audited-financials-2024", "expected_topic": "customer concentration"},
+  {"question": "When was the company incorporated?", "expected_document_id": "registry-record", "expected_topic": "corporate registry"}
+]
