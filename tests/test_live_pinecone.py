@@ -7,10 +7,10 @@ from app.ingestion.pipeline import ingest_case
 from app.retrieval.index import PineconeVectorIndex
 
 
-LIVE = bool(os.getenv("PINECONE_API_KEY") and (os.getenv("PINECONE_INDEX") or os.getenv("PINECONE_HOST")) and os.getenv("LLM_API_KEY"))
+LIVE = bool(os.getenv("PINECONE_API_KEY") and (os.getenv("PINECONE_INDEX") or os.getenv("PINECONE_HOST")) and (os.getenv("OPENROUTER_API_KEY") or os.getenv("LLM_API_KEY")))
 
 
-@unittest.skipUnless(LIVE, "requires PINECONE_API_KEY, PINECONE_INDEX or PINECONE_HOST, and LLM_API_KEY")
+@unittest.skipUnless(LIVE, "requires Pinecone configuration and an embedding credential")
 class LivePineconeTests(unittest.TestCase):
     """Uses only the checked-in synthetic case and the configured test namespace."""
 
