@@ -17,3 +17,7 @@ Live embeddings use `EMBEDDING_MODEL` (default `text-embedding-3-small`) through
 ## Failure modes
 
 Irrelevant retrieval, insufficient evidence, conflicting evidence, missing or stale documents, provider failure, and hallucination risk remain possible. The UI shows the retrieved chunks and missing-evidence list so a reviewer can inspect the boundary. There is no reranker or hybrid search yet; those are future improvements alongside a larger labeled Recall@K benchmark.
+
+## Validation status
+
+**Implemented:** ingestion, chunking, metadata enrichment, configurable embeddings, Pinecone upsert/query, metadata filtering, evidence context construction, optional LLM reasoning, source mapping, and deterministic offline fallback. **Offline validated:** the synthetic corpus, retrieval path, context construction, grounding behavior, and insufficient-evidence behavior pass the local test suite. **Live Pinecone validated:** **NOT TESTED** in the current environment because Pinecone credentials and the SDK were unavailable. The repository therefore makes no claim that a real Pinecone index was queried in this validation pass.

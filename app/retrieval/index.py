@@ -51,8 +51,11 @@ class PineconeVectorIndex:
         vector = self.embedder.embed([question])[0]
         response = self.index.query(vector=vector, top_k=top_k, include_metadata=True, namespace=self.namespace, filter=metadata_filter)
         results: list[RetrievedEvidence] = []
-        for rank, match in enumerate(response.get("matches", []), 1):
-            metadata = dict(match.get("metadata", {}))
-            chunk = DocumentChunk(chunk_id=str(match["id"]), text=str(metadata.pop("text", "")), document_id=str(metadata.pop("document_id", "unknown")), document_name=str(metadata.pop("document_name", "unknown")), document_type=str(metadata.pop("document_type", "evidence")), page_number=metadata.pop("page_number", None), section=metadata.pop("section", None), source=metadata.pop("source", None), date=metadata.pop("date", None), metadata=metadata)
-            results.append(RetrievedEvidence(chunk=chunk, score=float(match.get("score", 0.0)), rank=rank))
+        matches = response.get("matches", []) if isinstance(response, dict) else getattr(response, "matches", [])
+        for rank, match in enumerate(matches, 1):
+            metadata = dict(match.get("metadata", {})) if isinstance(match, dict) else dict(getattr(match, "metadata", {}) or {})
+            match_id = match.get("id") if isinstance(match, dict) else getattr(match, "id", "unknown")
+            score = match.get("score", 0.0) if isinstance(match, dict) else getattr(match, "score", 0.0)
+            chunk = DocumentChunk(chunk_id=str(match_id), text=str(metadata.pop("text", "")), document_id=str(metadata.pop("document_id", "unknown")), document_name=str(metadata.pop("document_name", "unknown")), document_type=str(metadata.pop("document_type", "evidence")), page_number=metadata.pop("page_number", None), section=metadata.pop("section", None), source=metadata.pop("source", None), date=metadata.pop("date", None), metadata=metadata)
+            results.append(RetrievedEvidence(chunk=chunk, score=float(score), rank=rank))
         return results

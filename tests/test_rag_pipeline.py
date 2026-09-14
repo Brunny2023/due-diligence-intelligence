@@ -48,6 +48,13 @@ class RagPipelineTests(unittest.TestCase):
         self.assertIn('Insufficient', answer.finding)
         self.assertFalse(answer.live_retrieval)
 
+    def test_unrepresented_fact_is_not_inferred_from_related_chunks(self):
+        chunks = ingest_case(self.case)
+        results = LocalVectorIndex(chunks, HashEmbeddingProvider()).query('What is the exact employee retention rate over five years?', top_k=3)
+        answer = reason_over_evidence('What is the exact employee retention rate over five years?', results)
+        self.assertEqual(answer.confidence, 'Low')
+        self.assertIn('Insufficient', answer.finding)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -25,7 +25,7 @@ class Handler(BaseHTTPRequestHandler):
         if urlparse(self.path).path in {"/", "/demo"}:
             self._send(200, HTML, "text/html; charset=utf-8")
         elif self.path == "/health":
-            self._send(200, json.dumps({"ok": True, "retrieval_mode": "live-pinecone" if SERVICE.live else "offline-demo"}), "application/json")
+            self._send(200, json.dumps({"ok": True, "retrieval_mode": "live-pinecone" if SERVICE.live else "offline-demo", "embedding_model": SERVICE.embedder.model, "upserted_chunks": SERVICE.upserted_chunks}), "application/json")
         else:
             self._send(404, "Not found", "text/plain")
 

@@ -35,6 +35,10 @@ python3 -m app.api.server
 
 Optional live providers are listed in `requirements-rag.txt`. Copy `.env.example` to `.env` and provide only your own server-side credentials. No credentials or proprietary customer data belong in this repository.
 
+## Validation status
+
+The offline pipeline is validated by the local test suite and the public demo smoke test. The live Pinecone path is implemented, including synthetic-corpus upsert and query, but is **NOT TESTED** in the current environment because Pinecone credentials and the SDK were unavailable. Do not interpret the implementation as proof of a live external-service run.
+
 ## Limitations and honesty boundary
 
 The checked-in demo dataset is synthetic. Offline mode is not semantic model inference and is not presented as Pinecone. Live Pinecone/LLM execution requires credentials and an index configured by the operator. Retrieval quality is not benchmarked here; reranking, hybrid search, and a larger labeled evaluation set remain future improvements. This is an analytical aid, not legal, financial, investment, tax, accounting, or regulatory advice.

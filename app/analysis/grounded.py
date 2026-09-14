@@ -1,6 +1,7 @@
 """Separate evidence retrieval/context construction from reasoning."""
 import json
 import os
+import re
 from typing import Any
 
 from app.models import GroundedAnswer, RetrievedEvidence
@@ -18,6 +19,12 @@ def _offline_reason(question: str, evidence: list[RetrievedEvidence]) -> Grounde
         return GroundedAnswer(question, "Insufficient retrieved evidence to answer this question.", "Low", [], ["Provide primary records relevant to the question."], "No inference made because retrieval returned no evidence.", "offline-deterministic", False)
     snippets = " ".join(item.chunk.text for item in evidence[:3])
     lowered = question.lower()
+    stopwords = {"what", "does", "the", "target", "have", "is", "are", "for", "an", "a", "of", "over", "five", "years", "exact"}
+    question_terms = {term for term in re.findall(r"[a-z]+", lowered) if term not in stopwords and len(term) > 3}
+    evidence_terms = set(re.findall(r"[a-z]+", snippets.lower()))
+    specificity_terms = {term for term in ("retention", "churn", "renewal", "margin", "ebitda", "covenant") if term in question_terms}
+    if not question_terms & evidence_terms or (specificity_terms and not specificity_terms & evidence_terms):
+        return GroundedAnswer(question, "Insufficient retrieved evidence to establish an answer.", "Low", evidence, ["Provide primary records that directly address the question."], "No inference made because the retrieved chunks do not contain the requested fact.", "offline-deterministic", False)
     if "concentration" in lowered and any(word in snippets.lower() for word in ("customer", "revenue", "largest")):
         finding = "The retrieved evidence indicates a customer concentration signal; confirm the percentage, period, and contract durability before relying on it."
     else:

@@ -14,7 +14,13 @@ class RAGService:
         self.embedder = configured_provider()
         chunks = ingest_case(case_path)
         self.live = bool(os.getenv("PINECONE_API_KEY") and (os.getenv("PINECONE_INDEX") or os.getenv("PINECONE_HOST")))
-        self.index = PineconeVectorIndex(self.embedder, namespace=os.getenv("PINECONE_NAMESPACE", "demo")) if self.live else LocalVectorIndex(chunks, self.embedder)
+        self.chunks = chunks
+        if self.live:
+            self.index = PineconeVectorIndex(self.embedder, namespace=os.getenv("PINECONE_NAMESPACE", "demo"))
+            self.upserted_chunks = self.index.upsert(chunks)
+        else:
+            self.index = LocalVectorIndex(chunks, self.embedder)
+            self.upserted_chunks = 0
 
     def query(self, question: str, top_k: int = 5) -> GroundedAnswer:
         evidence = self.index.query(question, top_k=top_k)
