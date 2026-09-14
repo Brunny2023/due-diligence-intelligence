@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 CASE = ROOT / "sample" / "input" / "northstar_acquisition.json"
 SERVICE = RAGService(CASE)
 HTML = (ROOT / "app" / "api" / "demo.html").read_text(encoding="utf-8")
+FRONTEND_ORIGIN = "https://ddi.maindev20.workers.dev"
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -18,14 +19,29 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(status)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(payload)))
+        origin = self.headers.get("Origin")
+        if origin == FRONTEND_ORIGIN:
+            self.send_header("Access-Control-Allow-Origin", FRONTEND_ORIGIN)
+            self.send_header("Vary", "Origin")
         self.end_headers()
         self.wfile.write(payload)
+
+    def do_OPTIONS(self) -> None:
+        if self.headers.get("Origin") != FRONTEND_ORIGIN:
+            self._send(403, json.dumps({"error": "origin not allowed"}), "application/json")
+            return
+        self.send_response(204)
+        self.send_header("Access-Control-Allow-Origin", FRONTEND_ORIGIN)
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Vary", "Origin")
+        self.end_headers()
 
     def do_GET(self) -> None:
         if urlparse(self.path).path in {"/", "/demo"}:
             self._send(200, HTML, "text/html; charset=utf-8")
         elif self.path == "/health":
-            self._send(200, json.dumps({"ok": True, "retrieval_mode": "live-pinecone" if SERVICE.live else "offline-demo", "embedding_model": SERVICE.embedder.model, "upserted_chunks": SERVICE.upserted_chunks}), "application/json")
+            self._send(200, json.dumps({"ok": True, "retrieval_mode": "live-pinecone" if SERVICE.live else "offline-demo", "embedding_model": SERVICE.embedder.model, "upserted_chunks": SERVICE.upserted_chunks, "pinecone_available": SERVICE.live}), "application/json")
         else:
             self._send(404, "Not found", "text/plain")
 

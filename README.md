@@ -19,6 +19,8 @@ Run `python3 -m app.api.server` and open `http://localhost:8000/demo`. The UI is
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) and [RAG.md](RAG.md). The core path is **documents → ingestion → chunking → embeddings → Pinecone/local index → semantic retrieval → evidence context → reasoning → grounded finding**.
 
+The public Cloudflare Worker hosts the static frontend. The Python API remains a separate service and can be connected by setting the browser-safe `window.DD_API_BASE` value in the frontend. The UI checks `/health` and labels the result `LIVE RAG` only when the backend reports live Pinecone mode; otherwise it remains `OFFLINE DEMO`.
+
 ## Existing analysis workflow
 
 The original implementation accepts structured JSON with a company, objective, source register, assertions, risks, opportunities, and evidence gaps. It produces Markdown/HTML due-diligence reports and deterministic validation. See [SKILL.md](SKILL.md), `scripts/`, and `sample/input/northstar_acquisition.json` (fictional).

@@ -8,7 +8,7 @@ The repository includes `wrangler.jsonc` and `public/index.html` so the frontend
 npx wrangler deploy
 ```
 
-The Wrangler configuration points at `./public/`, which resolves the error `Could not detect a directory containing static files`. The static deployment serves the UI at `/`. The UI's `/api/query` requests require the Python backend to be deployed separately on a Python-capable service. For a complete live demo, configure the frontend API origin to that backend and set `PINECONE_API_KEY`, `PINECONE_INDEX` or `PINECONE_HOST`, and provider credentials only in the backend's server-side secrets.
+The Wrangler configuration points at `./public/`, which resolves the error `Could not detect a directory containing static files`. The static deployment serves the UI at `/`. The UI reads an optional browser-safe `window.DD_API_BASE` value; set it to the Python backend's public HTTPS origin in the deployed frontend. The UI then calls `<DD_API_BASE>/health` to show `LIVE RAG` only when the backend reports live Pinecone mode, and calls `<DD_API_BASE>/api/query` for analysis. The Python backend must be deployed separately on a Python-capable service. Set `PINECONE_API_KEY`, `PINECONE_INDEX` or `PINECONE_HOST`, and provider credentials only in the backend's server-side secrets.
 
 Do not add Pinecone or LLM keys to Cloudflare static asset files, browser code, GitHub, or `.env.example`. The checked-in demo corpus is synthetic and safe for public asset hosting.
 
