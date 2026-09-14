@@ -1,0 +1,81 @@
+{
+  "company": {
+    "name": "Northstar Industrial Systems Ltd.",
+    "website": "https://northstar-industrial.example",
+    "description": "Fictional manufacturer of industrial monitoring equipment and related maintenance software."
+  },
+  "objective": "Acquisition Target",
+  "report_mode": "Deep Due Diligence",
+  "investigation_period": "FY2024–FY2025",
+  "sources": [
+    {
+      "id": "registry-record",
+      "source_type": "corporate_registry",
+      "evidence_tier": 1,
+      "date": "2025-01-31",
+      "summary": "Fictional registry extract showing the company was incorporated in 2016 and has a single listed holding company.",
+      "assertions": [
+        {"claim_id": "founding_year", "claim": "Northstar Industrial Systems Ltd. was incorporated in 2016.", "value": "2016", "classification": "FACT"}
+      ]
+    },
+    {
+      "id": "website-2025",
+      "source_type": "company_website",
+      "evidence_tier": 3,
+      "date": "2025-11-15",
+      "summary": "Fictional company website describing Northstar as a market leader with 500 specialists and North American operations.",
+      "assertions": [
+        {"claim_id": "employee_count", "claim": "Northstar employs 500 specialists.", "value": "500", "classification": "COMPANY CLAIM"},
+        {"claim_id": "market_position", "claim": "Northstar is the market leader in industrial monitoring.", "value": "market leader", "classification": "COMPANY CLAIM"}
+      ]
+    },
+    {
+      "id": "pitch-deck-2025",
+      "source_type": "company_presentation",
+      "evidence_tier": 3,
+      "date": "2025-10-01",
+      "summary": "Fictional pitch deck describing 1,200 employees, 300 customers, and expansion into Europe.",
+      "assertions": [
+        {"claim_id": "employee_count", "claim": "Northstar has 1,200 employees.", "value": "1200", "classification": "COMPANY CLAIM"},
+        {"claim_id": "customer_count", "claim": "Northstar serves more than 300 customers.", "value": "300+", "classification": "COMPANY CLAIM"},
+        {"claim_id": "geographic_footprint", "claim": "Northstar is expanding into Europe.", "value": "Europe expansion", "classification": "COMPANY CLAIM"}
+      ]
+    },
+    {
+      "id": "audited-financials-2024",
+      "source_type": "audited_financial_statement",
+      "evidence_tier": 1,
+      "date": "2025-03-31",
+      "summary": "Fictional audited FY2024 financial summary reporting US$26m revenue; largest customer represented 38% of revenue.",
+      "assertions": [
+        {"claim_id": "fy2024_revenue", "claim": "FY2024 revenue was US$26m.", "value": "26000000 USD", "classification": "FACT"},
+        {"claim_id": "customer_concentration", "claim": "The largest customer represented 38% of FY2024 revenue.", "value": "38%", "classification": "FACT"}
+      ]
+    },
+    {
+      "id": "customer-concentration-schedule",
+      "source_type": "customer_concentration",
+      "evidence_tier": 1,
+      "date": "2025-03-31",
+      "summary": "Fictional management schedule consistent with the audited FY2024 concentration disclosure.",
+      "assertions": [
+        {"claim_id": "customer_concentration", "claim": "The largest customer represented 38% of FY2024 revenue.", "value": "38%", "classification": "FACT"}
+      ]
+    }
+  ],
+  "risks": [
+    {
+      "category": "Commercial",
+      "issue": "Customer concentration is material based on the supplied FY2024 evidence.",
+      "severity": "High",
+      "confidence": "High",
+      "evidence": "audited-financials-2024; customer-concentration-schedule",
+      "potential_impact": "Loss or repricing of the largest customer could materially affect revenue and valuation assumptions.",
+      "follow_up_question": "Provide the major customer contract, renewal history, churn information, and pipeline diversification plan."
+    }
+  ],
+  "opportunities": [
+    "ANALYST INFERENCE: the supplied materials indicate potential adjacency between hardware monitoring and maintenance software, subject to customer retention and product-evidence verification."
+  ]
+}
+

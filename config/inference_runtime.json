@@ -1,0 +1,32 @@
+{
+  "runtime": {
+    "provider": "openrouter",
+    "default_mode": "production",
+    "mode_env": "DDI_INFERENCE_MODE",
+    "base_url": "https://openrouter.ai/api/v1",
+    "allowed_hosts": ["openrouter.ai"],
+    "api_key_env": "OPENROUTER_API_KEY",
+    "model_env": "DDI_OPENROUTER_MODEL",
+    "model_id": null,
+    "generation": {
+      "temperature": 0.1,
+      "max_output_tokens": 3000
+    },
+    "timeout": {
+      "seconds": 45
+    },
+    "retry": {
+      "max_retries": 1,
+      "backoff_seconds": 0.25
+    },
+    "mock_response": "Mock contextual interpretation for deterministic local V2.2 testing. Validate all outputs with the preserved V2.1 controls."
+  },
+  "production_contract": {
+    "publisher_selected_model_required": true,
+    "verified_nonproduction_example_model_id": "openai/gpt-5.2",
+    "network_calls_only_on_explicit_invocation": true,
+    "user_material_transmission_requires_execution_context_permission": true,
+    "future_model_routing_enabled": false,
+    "application_request_counter_enabled": false
+  }
+}
