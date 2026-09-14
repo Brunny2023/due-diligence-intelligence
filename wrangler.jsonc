@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/wrangler/config-schema.json",
+  "name": "due-diligence-intelligence-demo",
+  "compatibility_date": "2026-09-14",
+  "assets": {
+    "directory": "./public/"
+  }
+}
