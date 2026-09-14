@@ -1,12 +1,9 @@
 """Static package security checks; this scanner never calls the network."""
-
 from __future__ import annotations
-
 import argparse
 import json
 import re
 from pathlib import Path
-
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[1]
 SECRET_PATTERNS = (
@@ -19,9 +16,8 @@ NETWORK_IMPORT = re.compile(r"^\s*(?:from\s+(?:urllib|http|requests|httpx|socket
 
 
 def scan_package(package_root: Path = PACKAGE_ROOT) -> dict:
-    """Return static credential and package-network boundary findings."""
-    failures: list[str] = []
-    scanned: list[str] = []
+    failures = []
+    scanned = []
     for path in sorted(package_root.rglob("*")):
         if not path.is_file() or path.suffix not in {".py", ".json", ".md", ".txt", ".html"}:
             continue
@@ -30,10 +26,8 @@ def scan_package(package_root: Path = PACKAGE_ROOT) -> dict:
         text = path.read_text(encoding="utf-8", errors="replace")
         relative = str(path.relative_to(package_root))
         scanned.append(relative)
-        for pattern in SECRET_PATTERNS:
-            if pattern.search(text):
-                failures.append(f"Potential hard-coded credential in {relative}.")
-                break
+        if any(pattern.search(text) for pattern in SECRET_PATTERNS):
+            failures.append(f"Potential hard-coded credential in {relative}.")
         if path.suffix == ".py" and path.parent.name == "scripts":
             if NETWORK_IMPORT.search(text):
                 failures.append(f"Network-capable import in deterministic helper: {relative}.")
@@ -43,7 +37,7 @@ def scan_package(package_root: Path = PACKAGE_ROOT) -> dict:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Scan the package for hard-coded credentials and network-capable helpers.")
+    parser = argparse.ArgumentParser(description="Scan package credentials and deterministic-helper network boundaries.")
     parser.add_argument("--package-root", type=Path, default=PACKAGE_ROOT)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()

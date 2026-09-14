@@ -1,30 +1,20 @@
 {
   "package_name": "business-due-diligence-intelligence",
   "display_name": "Business Due Diligence & Acquisition Intelligence",
-  "version": "2.1-rebased",
+  "version": "2.1-rebased-final",
   "architecture": {
     "analytical_baseline": "V2.1 evidence and decision-intelligence methodology",
-    "host_llm_role": "The host environment supplies any configured LLM for contextual interpretation and synthesis.",
-    "package_llm_infrastructure": "None: no provider adapter, endpoint, authentication, credential management, model selection, or routing is implemented by this package."
+    "host_llm_role": "The host environment may supply an LLM for contextual interpretation and synthesis.",
+    "package_llm_infrastructure": "None: no provider adapter, endpoint, authentication, credential management, model selection, routing, billing, or subscription system."
   },
   "runtime": {
     "python": ">=3.10",
     "dependencies": [],
     "network_required": false,
     "persistent_backend_required": false,
-    "database_required": false,
-    "mcp_server_required": false,
     "execution_mode": "Run on demand; no polling, scheduling, background workers, idle model processes, or persistent service."
   },
-  "supported_objectives": [
-    "Acquisition Target",
-    "Investment Target",
-    "Vendor/Supplier",
-    "Partnership",
-    "Customer/Client",
-    "Competitor",
-    "General Company Investigation"
-  ],
+  "supported_objectives": ["Acquisition Target", "Investment Target", "Vendor/Supplier", "Partnership", "Customer/Client", "Competitor", "General Company Investigation"],
   "report_modes": ["Quick Screen", "Standard Due Diligence", "Deep Due Diligence"],
   "output_formats": ["Markdown", "HTML"],
   "security": {
@@ -37,9 +27,8 @@
   },
   "publication": {
     "recommended_delivery": "Run on Capafy",
-    "category_selection": "Select from the current Capafy preset list at packaging time; do not use a custom category.",
-    "tag_candidates": ["Due Diligence", "Business Intelligence", "Risk Analysis", "Company Research", "M&A"],
+    "category_selection": "Select current platform presets at packaging time.",
     "support_email": "REPLACE-BEFORE-SUBMISSION@example.com",
-    "pricing_status": "Commercial configuration is host-managed. The intended $19/month and 60 substantive user investigations/month are not implemented or counted by this package."
+    "commercial_configuration": "Host-managed; the Skill does not count, bill, or enforce requests."
   }
 }
