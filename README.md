@@ -21,6 +21,8 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) and [RAG.md](RAG.md). The core path is **
 
 The public Cloudflare Worker hosts the static frontend. The Python API remains a separate service and can be connected by setting the browser-safe `window.DD_API_BASE` value in the frontend. The UI checks `/health` and labels the result `LIVE RAG` only when the backend reports live Pinecone mode; otherwise it remains `OFFLINE DEMO`.
 
+The repository includes Fly.io packaging (`Dockerfile` and `fly.toml`) for the existing Python API. A Fly deployment and live external-provider validation are not claimed until the Fly application is authenticated, deployed, and tested. The current code uses an OpenAI-compatible LLM/embedding contract; it does not claim OpenRouter or Claude Opus 5 support without an explicit implementation and observed validation.
+
 ## Existing analysis workflow
 
 The original implementation accepts structured JSON with a company, objective, source register, assertions, risks, opportunities, and evidence gaps. It produces Markdown/HTML due-diligence reports and deterministic validation. See [SKILL.md](SKILL.md), `scripts/`, and `sample/input/northstar_acquisition.json` (fictional).
