@@ -12,7 +12,7 @@ Live embeddings use `EMBEDDING_MODEL` (default `text-embedding-3-small`) through
 
 ## Grounding and reasoning
 
-`build_context()` formats each result as `[E#] document | page | score` followed by the exact chunk. The optional LLM prompt requires JSON, evidence labels, and a distinction between evidence, inference, uncertainty, and missing information. Without an LLM key, the demo returns a bounded deterministic synthesis rather than pretending a model was called.
+`build_context()` formats each result as `[E#] document | page | score` followed by the exact chunk. When configured, the reasoning layer sends that context through OpenRouter's OpenAI-compatible API using `OPENROUTER_BASE_URL` and `OPENROUTER_MODEL` (default `anthropic/claude-opus-5`) with `OPENROUTER_API_KEY` held server-side. The prompt requires JSON, evidence labels, and a distinction between evidence, inference, uncertainty, and missing information. Without an OpenRouter key, the demo returns a bounded deterministic synthesis rather than pretending a model was called; it does not silently fall back to direct OpenAI reasoning.
 
 ## Failure modes
 

@@ -6,6 +6,9 @@ from typing import Any
 
 from app.models import GroundedAnswer, RetrievedEvidence
 
+OPENROUTER_DEFAULT_BASE_URL = "https://openrouter.ai/api/v1"
+OPENROUTER_DEFAULT_MODEL = "anthropic/claude-opus-5"
+
 
 def build_context(evidence: list[RetrievedEvidence]) -> str:
     return "\n\n".join(
@@ -32,16 +35,47 @@ def _offline_reason(question: str, evidence: list[RetrievedEvidence]) -> Grounde
     return GroundedAnswer(question, finding, "Medium", evidence, ["Independent corroboration and complete primary schedules."], "This is an evidence-bounded synthesis of retrieved chunks, not a verified conclusion.", "offline-deterministic", False)
 
 
+def _openrouter_settings() -> tuple[str, str, str]:
+    api_key = os.getenv("OPENROUTER_API_KEY", "")
+    if not api_key:
+        raise RuntimeError("OPENROUTER_API_KEY is required for live OpenRouter reasoning")
+    return (
+        api_key,
+        os.getenv("OPENROUTER_BASE_URL", OPENROUTER_DEFAULT_BASE_URL),
+        os.getenv("OPENROUTER_MODEL", OPENROUTER_DEFAULT_MODEL),
+    )
+
+
 def reason_over_evidence(question: str, evidence: list[RetrievedEvidence]) -> GroundedAnswer:
-    if not os.getenv("LLM_API_KEY"):
+    if not os.getenv("OPENROUTER_API_KEY"):
         return _offline_reason(question, evidence)
+
+    api_key, base_url, model = _openrouter_settings()
     from openai import OpenAI
-    client = OpenAI(api_key=os.environ["LLM_API_KEY"])
+
+    client = OpenAI(api_key=api_key, base_url=base_url)
     prompt = {
         "question": question,
         "evidence": build_context(evidence),
         "instruction": "Return JSON with finding, confidence, inference, and missing_evidence. Cite only E# labels from the supplied evidence. Distinguish evidence from inference and uncertainty. Never invent facts.",
     }
-    response = client.chat.completions.create(model=os.getenv("LLM_MODEL", "gpt-4o-mini"), response_format={"type": "json_object"}, messages=[{"role": "system", "content": "You are an evidence-grounded due diligence analyst."}, {"role": "user", "content": json.dumps(prompt)}])
+    response = client.chat.completions.create(
+        model=model,
+        response_format={"type": "json_object"},
+        messages=[
+            {"role": "system", "content": "You are an evidence-grounded due diligence analyst."},
+            {"role": "user", "content": json.dumps(prompt)},
+        ],
+    )
     parsed: dict[str, Any] = json.loads(response.choices[0].message.content)
-    return GroundedAnswer(question, str(parsed.get("finding", "Insufficient evidence.")), str(parsed.get("confidence", "Low")), evidence, list(parsed.get("missing_evidence", [])), str(parsed.get("inference", "")), os.getenv("LLM_MODEL", "gpt-4o-mini"), False)
+    resolved_model = getattr(response, "model", None) or model
+    return GroundedAnswer(
+        question,
+        str(parsed.get("finding", "Insufficient evidence.")),
+        str(parsed.get("confidence", "Low")),
+        evidence,
+        list(parsed.get("missing_evidence", [])),
+        str(parsed.get("inference", "")),
+        f"OpenRouter/{resolved_model}",
+        False,
+    )
