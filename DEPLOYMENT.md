@@ -1,11 +1,51 @@
 # Deployment
 
-The showcase is a small Python HTTP service and can run on any host that supports Python 3.10+. Start it with `python3 -m app.api.server`; it binds to `0.0.0.0:8000` and exposes `/health`, `/api/query`, and `/demo`. `Dockerfile` and `fly.toml` provide a Fly.io deployment definition using the existing application without changing its architecture. Fly deployment and live Pinecone/LLM validation remain **NOT TESTED** until Fly authentication and production provider configuration are available.
+The active deployment is a split architecture:
 
-For live mode, inject environment variables from a secret manager. Do not place keys in HTML, JavaScript, Git history, or `.env.example`. Keep Pinecone and LLM calls server-side. The checked-in synthetic case is safe for demonstration; do not upload confidential diligence materials.
+- **Frontend:** Cloudflare Worker `ddi` serves the static browser shell.
+- **API:** Lizard service `due-diligence-intelligence` in `us-east-1` runs the Python service.
+- **Runtime:** Python standard-library `ThreadingHTTPServer`.
+- **Port:** `8000`, bound to `0.0.0.0`.
+- **Startup command:** `python3 -m app.api.server`.
+- **Public API:** `https://crew-trumpet-thv1.us-east-1.onlizard.com`.
 
-The public demo is currently **offline validated** and reports `offline-demo` from `/health`. Live Pinecone deployment is implemented but **NOT TESTED** in this environment because Pinecone credentials and the SDK were unavailable. Configure a dedicated validation namespace before enabling live mode; do not point it at an unrelated production index.
+The Python service must run separately from the static Cloudflare frontend. The frontend may point to the API with the browser-safe `window.DD_API_BASE` value. Provider credentials remain in Lizard server-side secrets.
 
-Lizard secrets must be configured server-side with the exact variables expected by the current code: `PINECONE_API_KEY`, `PINECONE_INDEX` or `PINECONE_HOST`, `PINECONE_NAMESPACE`, `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, `OPENROUTER_MODEL`, `OPENROUTER_EMBEDDING_MODEL`, and `OPENROUTER_EMBEDDING_DIMENSION`. OpenRouter is used for both embeddings and LLM reasoning through its OpenAI-compatible API; the intended reasoning model is `anthropic/claude-opus-5`. Direct OpenAI-compatible embedding variables remain supported for backward compatibility but are not required when OpenRouter embedding variables are configured. The embedding provider refuses to upsert vectors when their observed dimension differs from the configured dimension. No credential belongs in the repository or frontend.
+## Live configuration names
 
-For Cloudflare static hosting, see [CLOUDFLARE.md](CLOUDFLARE.md). The included `wrangler.jsonc` deploys the browser demo shell from `public/`; the Python RAG API must run separately on a Python-capable backend.
+The current code recognizes these names:
+
+```text
+PINECONE_API_KEY
+PINECONE_INDEX
+PINECONE_HOST
+PINECONE_NAMESPACE
+LLM_API_KEY
+EMBEDDING_MODEL
+EMBEDDING_DIMENSION
+OPENROUTER_API_KEY
+OPENROUTER_BASE_URL
+OPENROUTER_MODEL
+OPENROUTER_EMBEDDING_MODEL
+OPENROUTER_EMBEDDING_DIMENSION
+```
+
+`PINECONE_INDEX` or `PINECONE_HOST` is required for live Pinecone selection, together with `PINECONE_API_KEY`. In the validated deployment, Pinecone used index `northstar-ddi` and namespace `northstar-validation`. OpenRouter embedding configuration used `openai/text-embedding-3-small` with dimension `1536`; reasoning used `anthropic/claude-opus-5`. The direct OpenAI-compatible embedding variables remain supported for backward compatibility.
+
+Do not put values for these variables in Git, Dockerfiles, frontend JavaScript, issue reports, or documentation. Configure secrets through the hosting platform's secret manager.
+
+## Validation record
+
+The deployed process reached stable health, startup indexing completed with five synthetic chunks, live OpenRouter embeddings returned 1536-dimensional vectors, and live Pinecone retrieval returned traceable matches in `northstar-validation`. The reasoning route reached OpenRouter during validation, but final generation was blocked by an upstream HTTP 402 caused by the available token/credit budget. No additional reasoning request is part of this documentation update.
+
+## Cloudflare boundary
+
+See [CLOUDFLARE.md](CLOUDFLARE.md) for the static frontend configuration. Cloudflare does not replace the Python API runtime and must not contain Pinecone or OpenRouter credentials.
+
+## Data boundary
+
+The checked-in Northstar case is synthetic. Do not upload confidential data to the public demonstration deployment or commit private diligence materials.
+
+## Historical files
+
+`Dockerfile`, `fly.toml`, and older reports may describe earlier packaging or validation phases. Fly.io and Render are not the active hosting targets documented here.
